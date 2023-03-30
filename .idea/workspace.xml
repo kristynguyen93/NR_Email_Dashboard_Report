@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ac921dcf-b66a-4348-a33c-eb17d99ca878" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/emailServer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/getDashboardPDF.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard-2023-03-30.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/getDashboardPDF.py" beforeDir="false" afterPath="$PROJECT_DIR$/getDashboardPDF.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

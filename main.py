@@ -9,11 +9,13 @@ import emailServer
 
 def main():
 
-    getDashboardPDF()
+    getDashboardPDF.getDashboardPDF()
+
+    filename = getDashboardPDF.dashboard_filename()
 
     # Define email content and attachment file path
     msg_body = "This is the message body"
-    attachment_path = "dashboard-2023-03-30.pdf"
+    attachment_path = filename
 
     # Define email sender, recipient, and subject
     from_email = "kristynguyen93@gmail.com"
@@ -38,7 +40,7 @@ def main():
         msg.attach(part)
 
     # Start email server
-    server = emailServer.lCustomSMTPServer(('0.0.0.0', 25), None)
+    server = emailServer.CustomSMTPServer(('0.0.0.0', 25), None)
 
     # Send email
     with smtplib.SMTP('localhost', 25) as smtp:
@@ -46,3 +48,6 @@ def main():
 
     # Run email server asynchronously
     asyncore.loop()
+
+if __name__ == '__main__':
+    main()

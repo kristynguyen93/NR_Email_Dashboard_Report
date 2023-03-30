@@ -7,27 +7,32 @@ import smtplib
 
 load_dotenv()
 
-api_key = os.environ.get('API_KEY')
-graphql_url = 'https://api.newrelic.com/graphql'
-headers = {
-    'Content-Type': 'application/json',
-    'API-Key': api_key
-}
+def dashboard_filename():
+    file_name = "dashboard-"+str(date.today())+".pdf"
 
-query = """
-mutation {
-  dashboardCreateSnapshotUrl(guid: "Mzc4NzcyM3xWSVp8REFTSEJPQVJEfDc0OTg4ODQ")
-}
-"""
+    return file_name
 
-response = requests.post(graphql_url, headers=headers, json={'query': query})
+def getDashboardPDF():
 
-data = json.loads(response.text)
-screenshot_url = data['data']['dashboardCreateSnapshotUrl']
+    api_key = os.environ.get('API_KEY')
+    graphql_url = 'https://api.newrelic.com/graphql'
+    headers = {
+        'Content-Type': 'application/json',
+        'API-Key': api_key
+    }
 
-response = requests.get(screenshot_url, headers=headers)
+    query = """
+    mutation {
+      dashboardCreateSnapshotUrl(guid: "Mzc4NzcyM3xWSVp8REFTSEJPQVJEfDc0OTg4ODQ")
+    }
+    """
 
-file_name = "dashboard-"+str(date.today())+".pdf"
+    response = requests.post(graphql_url, headers=headers, json={'query': query})
 
-with open(file_name, 'wb') as f:
-    f.write(response.content)
+    data = json.loads(response.text)
+    screenshot_url = data['data']['dashboardCreateSnapshotUrl']
+
+    response = requests.get(screenshot_url, headers=headers)
+
+    with open(dashboard_filename(), 'wb') as f:
+        f.write(response.content)
