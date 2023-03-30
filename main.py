@@ -1,85 +1,48 @@
-import requests
-import json
-import os
-from dotenv import load_dotenv
-from datetime import date
+import asyncore
 import smtplib
 from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 from email import encoders
+import getDashboardPDF
+import emailServer
 
-load_dotenv()
+def main():
 
-api_key = os.environ.get('API_KEY')
-graphql_url = 'https://api.newrelic.com/graphql'
-headers = {
-    'Content-Type': 'application/json',
-    'API-Key': api_key
-}
+    getDashboardPDF()
 
-query = """
-mutation {
-  dashboardCreateSnapshotUrl(guid: "Mzc4NzcyM3xWSVp8REFTSEJPQVJEfDc0OTg4ODQ")
-}
-"""
+    # Define email content and attachment file path
+    msg_body = "This is the message body"
+    attachment_path = "dashboard-2023-03-30.pdf"
 
-response = requests.post(graphql_url, headers=headers, json={'query': query})
+    # Define email sender, recipient, and subject
+    from_email = "kristynguyen93@gmail.com"
+    to_email = "kristynguyen93@outlook.com"
+    subject = "Test email with attachment"
 
-data = json.loads(response.text)
-screenshot_url = data['data']['dashboardCreateSnapshotUrl']
+    # Set up message content
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
 
-response = requests.get(screenshot_url, headers=headers)
+    # Add message body
+    msg.attach(MIMEText(msg_body, 'plain'))
 
-file_name = "dashboard-"+str(date.today())+".pdf"
+    # Add attachment
+    with open(attachment_path, "rb") as attachment:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header("Content-Disposition", f"attachment; filename= {attachment_path}")
+        msg.attach(part)
 
-with open(file_name, 'wb') as f:
-    f.write(response.content)
+    # Start email server
+    server = emailServer.lCustomSMTPServer(('0.0.0.0', 25), None)
 
-sender = 'no_reply@mydomain.com'
-receivers = ['kristynguyen93@gmail.com']
+    # Send email
+    with smtplib.SMTP('localhost', 25) as smtp:
+        smtp.send_message(msg)
 
-message = """From: No Reply <no_reply@mydomain.com>
-To: Person <person@otherdomain.com>
-Subject: Test Email
-
-This is a test e-mail message.
-"""
-
-try:
-    smtp_obj = smtplib.SMTP('localhost:1025')
-    smtp_obj.sendmail(sender, receivers, message)
-    print("Successfully sent email")
-except smtplib.SMTPException:
-    print("Error: unable to send email")
-
-#
-# # Set up sender and recipient email addresses
-# sender = 'sender@example.com'
-# recipient = 'kristynguyen93@gmail.com'
-#
-# # Create message object and set headers
-# msg = MIMEMultipart()
-# msg['From'] = sender
-# msg['To'] = recipient
-# msg['Subject'] = 'Email with Attachment'
-#
-# # Attach file to message
-# filename = 'dashboard.pdf'
-# attachment = open(filename, 'rb')
-# part = MIMEBase('application', 'octet-stream')
-# part.set_payload(attachment.read())
-# encoders.encode_base64(part)
-# part.add_header('Content-Disposition', f"attachment; filename= {filename}")
-# msg.attach(part)
-#
-# # Add message body
-# body = 'This email has an attachment. Please see the attached file.'
-# msg.attach(MIMEText(body, 'plain'))
-#
-# # Send email
-# smtp_server = 'localhost'
-# smtp_port = 1025
-#
-# with smtplib.SMTP(smtp_server, smtp_port) as server:
-#     server.sendmail(sender, recipient, msg.as_string())
+    # Run email server asynchronously
+    asyncore.loop()
